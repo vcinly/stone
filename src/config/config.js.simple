@@ -1,0 +1,8 @@
+import Env from './env';
+
+let config = {
+    env: Env,
+    apikey: '',
+    contract: ''
+};
+export default config;

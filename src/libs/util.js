@@ -2,6 +2,9 @@ import axios from 'axios';
 import env from '../config/env';
 import config from '../config/config';
 
+var Web3EthAbi = require('web3-eth-abi');
+var Web3Utils = require('web3-utils');
+
 let util = {
 
 };
@@ -11,10 +14,10 @@ util.title = function(title) {
 };
 
 const ajaxUrl = env === 'development' ?
-    "https://api-ropsten.etherscan.io" :
+    "https://api-rinkeby.etherscan.io" :
     env === 'production' ?
     "https://api.etherscan.io" :
-    "https://api-rinkeby.etherscan.io";
+    "https://api-ropsten.etherscan.io";
 
 util.ajax = axios.create({
     baseURL: ajaxUrl,
@@ -61,9 +64,11 @@ util.getTopicsList = (total, page, offset=20) => {
     } else {
         let start = (page - 1) * offset - 1;
         start = start < 0 ? 0 : start;
-        let diff = total - 1 - start;
+        let diff = total - start;
         let len = diff < offset ? diff : offset;
-        let data = web3.eth.abi.encodeFunctionCall({
+        console.log('start', start);
+        console.log('len', len);
+        let data = Web3EthAbi.encodeFunctionCall({
             name: 'topicsList',
             type: 'function',
             inputs: [{
@@ -88,6 +93,16 @@ util.getTopicName = (address) => {
     // let data = web3.eth.abi.encodeFunctionSignature('name()');
     let data = '0x06fdde03';
     return util.getCall(address, data);
+};
+
+util.decodeParameter = (type, data) => {
+    return Web3EthAbi.decodeParameter(type, data);
+};
+util.decodeParameters = (types, data) => {
+    return Web3EthAbi.decodeParameters(types, data);
+};
+util.hexToUtf8 = (data) => {
+    return Web3Utils.hexToUtf8(data);
 };
 
 

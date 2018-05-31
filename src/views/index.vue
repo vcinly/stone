@@ -49,15 +49,63 @@
 <template>
     <Scroll :on-reach-bottom="handleReachBottom" :height="getClientHeight()">
         <Card dis-hover v-for="(item, index) in list1" :key="index" style="margin: 32px 0" @click.native="handleItem(item)">
-            Content {{ item }}
+            Name: {{item.name}},   Address: {{ item.address }}
         </Card>
     </Scroll>
 </template>
+
+
+
+<!-- <script src="./libs/util.js"></script> -->
 <script>
+import util from '../libs/util'
 export default {
     data () {
+        util.getTopicsCount().then(data => {
+            let count = util.decodeParameter('uint256', data.data.result)
+            console.log(count)
+            let self = this
+            util.getTopicsList(count, 1).then(async function (data) {
+                console.log(data)
+                let list = util.decodeParameter('address[]', data.data.result)
+                console.log(list)
+                let list1 = []
+                
+                // await list.forEach(async (x, i) => {
+                //     await util.getTopicName(x).then(async (data) => {
+                //         console.log(i)
+                //         list1[i] = {
+                //             name: util.decodeParameter('string', data.data.result),
+                //             address: x
+                //         }
+                //     })
+                // })
+                // console.log('done')
+                
+                // console.log(list1)
+                // self.list1 = list1
+                
+                let requests = list.map((x, i) => {
+                    return new Promise((resolve) => {
+                        // asyncFunction(item, resolve);
+                        util.getTopicName(x).then(async (data) => {
+                            console.log(i)
+                            list1[i] = {
+                                name: util.decodeParameter('string', data.data.result),
+                                address: x
+                            }
+                            resolve();
+                        })
+                    });
+                });
+                Promise.all(requests).then(() => {
+                    console.log('done')
+                    self.list1 = list1
+                });
+            })
+        })
         return {
-            list1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            list1: []
         }
     },
     methods: {
@@ -77,7 +125,7 @@ export default {
         },
         handleItem (item) {
             console.log(item)
-            this.$router.push({ name: 'topic', params: { address: item }})
+            this.$router.push({ name: 'topic', params: { address: item.address }})
         }
     }
 }

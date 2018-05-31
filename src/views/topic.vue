@@ -2,17 +2,36 @@
     <div style="background:#eee;padding: 20px">
         <Scroll :on-reach-bottom="handleReachBottom" :height="getClientHeight()">
         <Card dis-hover v-for="(item, index) in list1" :key="index" style="margin: 32px 0">
-            <p slot="title">No border title</p>
-            <p>Content of no border type. Content of no border type. Content of no border type. Content of no border type. </p>
+            <p slot="title">From: {{ item.from }}</p>
+            <p>{{ item.inputDecoded }}</p>
         </Card>
     </Scroll>
     </div>
 </template>
 <script>
+import util from '../libs/util'
 export default {
     data () {
+        util.getTopicName(this.$route.params.address),then(data => {
+            this.list1 = [
+                {
+                    from: this.$route.params.address,
+                    input: util.decodeParameter('string', data.data.result)
+                }
+            ]
+            
+            util.getTxlist(this.$route.params.address).then(data => {
+                console.log(data)
+                let list = data.data.result
+                list.forEach(x => {
+                    x.inputDecoded = util.hexToUtf8(x.input)
+                })
+                this.list1 = this.list1.concat(list)
+            })
+        })
+        
         return {
-            list1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            list1: []
         }
     },
     methods: {

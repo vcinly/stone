@@ -1,5 +1,5 @@
 <template>
-    <div style="background:#eee;padding: 20px">
+    <div style="background:#eee;padding: 0 20px">
         <Scroll :on-reach-bottom="handleReachBottom" :height="getClientHeight()">
         <Card dis-hover v-for="(item, index) in list1" :key="index" style="margin: 32px 0">
             <p slot="title">From: {{ item.from }}</p>
@@ -11,22 +11,26 @@
 <script>
 import util from '../libs/util'
 export default {
+    created(){
+        document.body.style="background:#eee; height: 100%;"
+    },
     data () {
-        util.getTopicName(this.$route.params.address),then(data => {
+        util.getTopicName(this.$route.params.address).then(data => {
             this.list1 = [
                 {
                     from: this.$route.params.address,
-                    input: util.decodeParameter('string', data.data.result)
+                    inputDecoded: util.decodeParameter('string', data.data.result)
                 }
             ]
             
+            let self = this
             util.getTxlist(this.$route.params.address).then(data => {
                 console.log(data)
                 let list = data.data.result
                 list.forEach(x => {
                     x.inputDecoded = util.hexToUtf8(x.input)
                 })
-                this.list1 = this.list1.concat(list)
+                self.list1 = self.list1.concat(list)
             })
         })
         
@@ -47,7 +51,7 @@ export default {
             });
         },
         getClientHeight () {
-            return document.body.clientWidth
+            return document.body.offsetWidth
         },
     }
 }

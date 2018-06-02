@@ -1,4 +1,7 @@
 <style scoped>
+.ivu-card-dis-hover:first-child {
+    margin: 0 !important;
+    }
     .index {
         width: 100%;
         position: absolute;
@@ -28,6 +31,7 @@
     .index .ivu-row-flex {
         height: 100%;
     }
+    
 </style>
 <!-- <template> -->
 <!--     <div class="index"> -->
@@ -47,11 +51,29 @@
 
 
 <template>
+  <div>
+
+    <div style="text-align: right;">
+     <Dropdown style="margin-left: 20px; text-align: center;">
+        <a href="javascript:void(0)">
+            Network
+            <Icon type="arrow-down-b"></Icon>
+        </a>
+        <DropdownMenu slot="list">
+            <DropdownItem>Main</DropdownItem>
+            <DropdownItem>Ropsten</DropdownItem>
+            <DropdownItem>Kovan</DropdownItem>
+            <DropdownItem>Rinkeby</DropdownItem>
+        </DropdownMenu>
+     </Dropdown>
+     </div>
+
     <Scroll :on-reach-bottom="handleReachBottom" :height="getClientHeight()">
         <Card dis-hover v-for="(item, index) in list1" :key="index" style="margin: 32px 0" @click.native="handleItem(item)">
-            Name: {{item.name}},   Address: {{ item.address }}
+            {{index + 1}}. {{item.name}}
         </Card>
     </Scroll>
+    </div>
 </template>
 
 
@@ -60,6 +82,9 @@
 <script>
 import util from '../libs/util'
 export default {
+    created(){
+        document.body.style="background:#eee;padding: 20px; height: 100%;"
+    },
     data () {
         util.getTopicsCount().then(data => {
             let count = util.decodeParameter('uint256', data.data.result)
@@ -121,7 +146,8 @@ export default {
             });
         },
         getClientHeight () {
-            return document.body.clientWidth
+            // console.log(document.body.offsetHeight)
+            return document.body.offsetWidth
         },
         handleItem (item) {
             console.log(item)
